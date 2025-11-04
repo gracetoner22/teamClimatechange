@@ -26,6 +26,8 @@ public:
     void printTree(naryNode* node = nullptr, int depth = 0);
     void buildTreeFromFile(const std::string& filename);
     double getEmission(const std::string& state, const std::string& year) const ;
+     void deleteSubtree(naryNode* node);
+    ~naryTree();
 };
 
 #endif
