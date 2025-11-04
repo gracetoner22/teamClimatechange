@@ -117,4 +117,14 @@ double naryTree::getEmission(const std::string& state, const std::string& year) 
 }
 
 
+void naryTree::deleteSubtree(naryNode* node) {
+    for (auto& [key, child]: node->childrenMap)
+        deleteSubtree(child);
+    delete node;
+}
+
+naryTree::~naryTree() {
+    deleteSubtree(root);
+}
+
 
