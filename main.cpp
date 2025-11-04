@@ -6,7 +6,7 @@
 using namespace std;
 
 int main() {
-    string filename = "allSectors.txt";
+    string filename = "data/allSectors.txt";
 
     cout << "            Options:\n"
          << "  All Sectors      Electric Sector\n "
@@ -24,13 +24,13 @@ int main() {
     getline(cin, yearInput);
 
     if (sectorInput == "Electric") {
-        filename = "Electric Sector.txt";
+        filename = "data/Electric Sector.txt";
     } else if (sectorInput == "Industrial") {
-        filename = "IndustrialSector.txt";
+        filename = "data/IndustrialSector.txt";
     } else if (sectorInput == "Transportation") {
-        filename = "transportationSector.txt";
+        filename = "data/transportationSector.txt";
     } else if (sectorInput == "Residential") {
-        filename = "residentialSector.txt";
+        filename = "data/residentialSector.txt";
     }
 
     naryTree tree;
