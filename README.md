@@ -14,6 +14,8 @@ EmissionsProject/
 
 
 └── README.md
+
+Dependencies:
 Using SFML 3.0.2
 imgui-1.91.5
 imgui-SFML 3.0
