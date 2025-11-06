@@ -6,7 +6,7 @@
 using namespace std;
 
 int main() {
-    string filename = "/Users/gracetoner22/Downloads/Co2 emissions/allSectors.txt";
+    string filename = "data/allSectors.txt";
 
     cout << "            Options:\n"
          << "  All Sectors      Electric Sector\n "
@@ -24,15 +24,15 @@ int main() {
     getline(cin, yearInput);
 
     if (sectorInput == "Electric") {
-        filename = "/Users/gracetoner22/Downloads/Co2 emissions/Electric Sector.txt";
+        filename = "data/Electric Sector.txt";
     } else if (sectorInput == "Industrial") {
-        filename = "/Users/gracetoner22/Downloads/Co2 emissions/IndustrialSector.txt";
+        filename = "data/IndustrialSector.txt";
     } else if (sectorInput == "Transportation") {
-        filename = "/Users/gracetoner22/Downloads/Co2 emissions/transportationSector.txt";
+        filename = "data/transportationSector.txt";
     } else if (sectorInput == "Residential") {
-        filename = "/Users/gracetoner22/Downloads/Co2 emissions/residentialSector.txt";
+        filename = "data/residentialSector.txt";
     }else if (sectorInput == "All") {
-        filename = "/Users/gracetoner22/Downloads/Co2 emissions/allSectors.txt";
+        filename = "data/allSectors.txt";
     }
     naryTree tree;
     tree.buildTreeFromFile(filename);
