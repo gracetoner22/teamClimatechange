@@ -1,4 +1,5 @@
 Welcome to Team Climate Change CO2 Emissions Data Program! 
+SFML Standard Library will need to be installed to run our program. 
 EmissionsProject/
 ├── src/                # Source code
 │   ├── main.cpp
