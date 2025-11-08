@@ -1,5 +1,5 @@
 Welcome to Team Climate Change CO2 Emissions Data Program! 
-
+In the main.cpp, you will see an unordered map, but it is only implemented to match the states abbreviations to the actual names. I will explain more in the video but I did want to ensure that it was not used for any other part of the project. 
 EmissionsProject/
 ├── src/                # Source code
 │   ├── main.cpp
