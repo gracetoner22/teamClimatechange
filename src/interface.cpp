@@ -12,6 +12,8 @@
 #include <sstream>
 #include <queue>
 #include <regex>
+#include <unordered_set>
+#include <filesystem>
 
 using namespace std;
 
@@ -95,6 +97,72 @@ string setHelpText() {
     return ss.str();
 }
 
+vector<string> generateDataSources(filesystem::path dataFolderPath) {
+    vector<string> files;
+    for (const auto& entry : filesystem::directory_iterator(dataFolderPath)) {
+        if (entry.is_regular_file()) {
+            filesystem::path p = entry.path();
+            string fileName = p.filename().string();
+            files.push_back(fileName);
+        }
+    }
+    return files;
+}
+
+void populateTable(naryNode* root, unordered_set<naryNode*>& visited) {
+    visited.insert(root);
+
+    for (size_t i = 0; i < root->childrenMap.table.size(); ++i) {
+        auto entry = root->childrenMap.table[i];   // Each bucket is a state which holds year values paired with their respective emissions for the state
+        while (entry) {
+            naryNode* childNode = entry->value;  // Content of bucket
+
+            // Indicates children are state nodes
+            
+            if (!childNode->childrenMap.table.empty()) {
+                if (!visited.count(childNode))
+                {
+                    std::cout << "Adding state: " << childNode->state << '\n';
+                    visited.insert(childNode);
+                    populateTable(childNode, visited);
+                }
+            }
+            else // Indicates children are year nodes
+            {
+                std::cout << "State: " << root->state << ", Year: " << childNode->state
+                    << ", Emission: " << childNode->emission << '\n';
+                ImGui::TableNextRow();
+                ImGui::TableSetColumnIndex(0);
+                ImGui::Text("%s", root->state.c_str());
+
+                ImGui::TableSetColumnIndex(1);
+                ImGui::Text("%.2f", childNode->emission);
+
+                ImGui::TableSetColumnIndex(2);
+                ImGui::Text("%s", childNode->state.c_str());   // State does contain year value
+            }      
+
+            entry = entry->next;
+        }
+    }
+}
+
+void generateTable(naryNode* root) {
+    unordered_set<naryNode*> visited;
+
+    if (ImGui::BeginTable("MyTable", 3, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY))
+    {
+        ImGui::TableSetupColumn("State");
+        ImGui::TableSetupColumn("Carbon Emissions (million metric tons)");
+        ImGui::TableSetupColumn("Year");
+        ImGui::TableHeadersRow();
+
+        /*populateTable(root, visited);*/
+
+        ImGui::EndTable();
+    }
+}
+
 int main() {
     const int windowWidth = 960,
         windowHeight = 720;
@@ -113,10 +181,14 @@ int main() {
     bool displayEntryNotFoundWindow = false;
 
     string helpText = "";
-    const string& dataFilePath = "data/allSectors.txt";
+    string dataFilePath = "data/allSectors.txt";
     string searchBoxText = "";
     string sourceBoxText = "";
     string emissionsDisplayText = "";
+
+    const string& dataFolderPath = "data";
+    vector<string> dataFiles = generateDataSources(filesystem::path(dataFolderPath));
+    static string selectedSource = "";
 
     naryTree tree;
     tree.buildTreeFromFile(dataFilePath);
@@ -133,48 +205,12 @@ int main() {
 
         ImGui::SFML::Update(window, deltaClock.restart());
 
-        ImGui::Begin("Climate Change Impact by State");
+        ImGui::Begin("Carbon Emissions by State");
 
         // Reserves a region in the ImGui box for a child element
         ImGui::BeginChild("TableScrollRegion", ImVec2(580, 400), false, ImGuiWindowFlags_HorizontalScrollbar);
 
-        if (ImGui::BeginTable("MyTable", 3, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY))
-        {
-            ImGui::TableSetupColumn("State");
-            ImGui::TableSetupColumn("Year");
-            ImGui::TableSetupColumn("Emissions");
-            ImGui::TableHeadersRow();
-
-            // data generated from the nary/hash map
-            int row = 0;
-            queue<naryNode*> q;
-            q.push(tree.root);
-
-            while (!q.empty())
-            {
-                naryNode* top = q.front();
-                q.pop();
-
-                ImGui::TableNextRow();
-                ImGui::TableSetColumnIndex(0);
-                ImGui::Text("%s", top->state.c_str());
-                ImGui::TableSetColumnIndex(1);
-                ImGui::Text("%s", to_string(top->emission).c_str());
-
-                for (size_t i = 0; i < top->childrenMap.table.size(); ++i) {
-                    auto entry = top->childrenMap.table[i];
-                    /*ImGui::TableSetColumnIndex(2);
-                    ImGui::Text("%s", entry->key);*/
-                    while (entry) {
-                        q.push(entry->value);
-                        entry = entry->next;
-                    }
-                }
-                row++;
-            }
-
-            ImGui::EndTable();
-        }
+        generateTable(tree.root);
 
         ImGui::EndChild();
 
@@ -209,7 +245,7 @@ int main() {
 
                     if (entryFound) {
                         ostringstream out;
-                        out << "Emissions for " << state << " during the year " << year << " were " << emissions << " million metric tons.";
+                        out << "Carbon emissions for " << state << " during the year " << year << " were " << emissions << " million metric tons.";
                         emissionsDisplayText = out.str();
                     }
                     else {
@@ -256,9 +292,22 @@ int main() {
             dialogWindow("Emissions", emissionsDisplayText, displayEntryNotFoundWindow, ImVec2(240, 180));
         }
 
-        if (ImGui::InputText("Source:", &sourceBoxText)) {
-            // Displays data from the source file entered by user
-            // Probably replace with a file finder button that allows the user to select where the file is from the explorer
+        if (ImGui::BeginCombo("Source: ", selectedSource.c_str())) {
+            for (int n = 0; n < dataFiles.size(); n++) {
+                bool isSelected = (selectedSource == dataFiles[n]);
+                if (ImGui::Selectable(dataFiles[n].c_str(), isSelected)) {
+                    selectedSource = dataFiles[n];
+
+                    dataFilePath = dataFolderPath + "/" + selectedSource;
+                    tree.deleteSubtree(tree.root);
+                    tree.root = new naryNode("USA");
+                    tree.buildTreeFromFile(dataFilePath);
+                }
+                if (isSelected) {
+                    ImGui::SetItemDefaultFocus();
+                }
+            }
+            ImGui::EndCombo();
         }
 
         if (ImGui::Button("Help")) {
