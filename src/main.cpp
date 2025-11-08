@@ -8,7 +8,7 @@
 using namespace std;
 
 int main() {
-    string filename = "/Users/gracetoner22/Downloads/Co2 emissions/allSectors.txt";
+    string filename = "data/allSectors.txt";
     string introHeading = "Welcome to Team Beat Climate Change’s Homepage!";
     int consoleWidth = 60;
     int padding = (consoleWidth - introHeading.length()) / 2;
@@ -62,15 +62,15 @@ int main() {
 
 
     if (sectorInput == "Electric") {
-        filename = "/Users/gracetoner22/Downloads/Co2 emissions/Electric Sector.txt";
+        filename = "data/Electric Sector.txt";
     } else if (sectorInput == "Industrial") {
-        filename = "/Users/gracetoner22/Downloads/Co2 emissions/IndustrialSector.txt";
+        filename = "data/IndustrialSector.txt";
     } else if (sectorInput == "Transportation") {
-        filename = "/Users/gracetoner22/Downloads/Co2 emissions/transportationSector.txt";
+        filename = "data/transportationSector.txt";
     } else if (sectorInput == "Residential") {
-        filename = "/Users/gracetoner22/Downloads/Co2 emissions/residentialSector.txt";
+        filename = "data/residentialSector.txt";
     }else if (sectorInput == "All") {
-        filename = "/Users/gracetoner22/Downloads/Co2 emissions/allSectors.txt";
+        filename = "data/allSectors.txt";
     }
      if (structureInput == "N-ary") {
         naryTree tree;
